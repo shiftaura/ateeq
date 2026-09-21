@@ -32,7 +32,7 @@ app.use(helmet());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: [env.CLIENT_URL, "http://localhost:5173", "https://ateeq-amber.vercel.app"],
+    origin: [process.env.CLIENT_URL, "http://localhost:5173", "https://ateeq-amber.vercel.app"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
