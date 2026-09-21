@@ -7,6 +7,12 @@ import Badge from './Badge';
 const DoctorCard = ({ doctor, className = '' }) => {
   if (!doctor) return null;
 
+  const doctorId = doctor.id || doctor._id;
+  const avatarUrl = doctor.avatar || doctor.profileImage || 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=256';
+  const hospitalName = doctor.hospital || doctor.clinic?.name || 'MediConsult Partner Clinic';
+  const feeDisplay = doctor.consultationFee || doctor.fee || '$60';
+  const availabilityText = doctor.availability || (doctor.isAvailable === false ? 'Unavailable' : 'Available Today');
+
   return (
     <div
       className={`bg-white rounded-2xl border border-border p-5 sm:p-6 shadow-card hover:shadow-card-hover transition-all duration-200 flex flex-col md:flex-row md:items-center justify-between gap-5 ${className}`}
@@ -15,8 +21,8 @@ const DoctorCard = ({ doctor, className = '' }) => {
       <div className="flex items-start gap-4 sm:gap-5 flex-1">
         <div className="relative flex-shrink-0">
           <img
-            src={doctor.avatar}
-            alt={doctor.name}
+            src={avatarUrl}
+            alt={doctor.name || 'Doctor'}
             className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-border shadow-subtle"
             loading="lazy"
           />
@@ -31,7 +37,7 @@ const DoctorCard = ({ doctor, className = '' }) => {
               {doctor.name}
             </h3>
             <Badge variant="teal" size="sm">
-              {doctor.specialization}
+              {doctor.specialization || 'Specialist'}
             </Badge>
           </div>
 
@@ -42,20 +48,20 @@ const DoctorCard = ({ doctor, className = '' }) => {
           <div className="flex flex-wrap items-center gap-y-1 gap-x-3 text-xs text-text-secondary mb-3">
             <div className="flex items-center gap-1">
               <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-              <span className="font-semibold text-text-primary">{doctor.rating}</span>
-              <span className="text-text-muted">({doctor.reviewCount} reviews)</span>
+              <span className="font-semibold text-text-primary">{doctor.rating ?? 4.9}</span>
+              <span className="text-text-muted">({doctor.reviewCount ?? 120} reviews)</span>
             </div>
             <span className="text-slate-300">•</span>
             <div className="flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5 text-text-muted" />
-              <span className="truncate max-w-[200px]">{doctor.hospital}</span>
+              <span className="truncate max-w-[200px]">{hospitalName}</span>
             </div>
           </div>
 
           {/* Availability pill */}
           <div className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
             <Clock className="w-3.5 h-3.5 text-emerald-600" />
-            <span>{doctor.availability}</span>
+            <span>{availabilityText}</span>
           </div>
         </div>
       </div>
@@ -65,17 +71,17 @@ const DoctorCard = ({ doctor, className = '' }) => {
         <div className="text-left md:text-right">
           <span className="text-xs text-text-muted block">Consultation Fee</span>
           <span className="text-base sm:text-lg font-bold text-text-primary">
-            {doctor.consultationFee || '$60'}
+            {feeDisplay}
           </span>
         </div>
 
         <div className="flex items-center gap-2 w-full md:w-auto">
-          <Link to={`/doctors/${doctor.id}`} className="flex-1 md:flex-initial">
+          <Link to={`/doctors/${doctorId}`} className="flex-1 md:flex-initial">
             <Button variant="outline" size="sm" className="w-full">
               View Profile
             </Button>
           </Link>
-          <Link to={`/appointments/book/${doctor.id}`} className="flex-1 md:flex-initial">
+          <Link to={`/appointments/book/${doctorId}`} className="flex-1 md:flex-initial">
             <Button variant="primary" size="sm" className="w-full" icon={Calendar}>
               Book Slot
             </Button>

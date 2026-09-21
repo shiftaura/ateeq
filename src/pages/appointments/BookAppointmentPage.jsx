@@ -38,17 +38,17 @@ const BookAppointmentPage = () => {
     doctorService.getDoctorById(doctorId)
       .then((data) => {
         setDoctor(data);
-        if (!appointmentDate && data.availableDates?.length > 0) {
+        if (!appointmentDate && Array.isArray(data?.availableDates) && data.availableDates.length > 0) {
           setAppointmentDate(data.availableDates[0]);
         }
-        if (!appointmentTime && data.timeSlots?.length > 0) {
+        if (!appointmentTime && Array.isArray(data?.timeSlots) && data.timeSlots.length > 0) {
           setAppointmentTime(data.timeSlots[0]);
         }
         setLoading(false);
       })
       .catch((err) => {
         console.error('Error fetching doctor for booking:', err);
-        setError(err.message || 'Unable to load doctor information.');
+        setError(err.response?.data?.message || err.message || 'Unable to load doctor information.');
         setLoading(false);
       });
   }, [doctorId]);
@@ -69,15 +69,16 @@ const BookAppointmentPage = () => {
 
     setBookingLoading(true);
     try {
+      const targetDocId = doctor?.id || doctor?._id || doctorId;
       const newAppointment = await appointmentService.bookAppointment({
-        doctorId: doctor.id,
+        doctorId: targetDocId,
         doctorName: doctor.name,
         doctorAvatar: doctor.avatar,
         specialization: doctor.specialization,
         date: appointmentDate,
         time: appointmentTime,
-        patientName: user?.name || 'Sarah Jenkins',
-        patientEmail: user?.email || 'sarah.jenkins@example.com',
+        patientName: user?.name || 'Patient',
+        patientEmail: user?.email || '',
         patientPhone: user?.phone || '',
         reason: reason.trim(),
         hospital: doctor.hospital,
@@ -86,7 +87,7 @@ const BookAppointmentPage = () => {
       });
 
       showToast('Appointment successfully scheduled!', 'success');
-      navigate(`/appointment-success/${newAppointment.id}`, {
+      navigate(`/appointment-success/${newAppointment?.id || newAppointment?._id || 'confirmed'}`, {
         state: { appointment: newAppointment },
         replace: true
       });
@@ -119,7 +120,7 @@ const BookAppointmentPage = () => {
       {/* Back button */}
       <div>
         <Link
-          to={`/doctors/${doctor.id}`}
+          to={`/doctors/${doctor?.id || doctor?._id || doctorId}`}
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-text-secondary hover:text-text-primary transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
@@ -244,7 +245,7 @@ const BookAppointmentPage = () => {
 
         {/* Actions */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-          <Link to={`/doctors/${doctor.id}`} className="w-full sm:w-auto">
+          <Link to={`/doctors/${doctor?.id || doctor?._id || doctorId}`} className="w-full sm:w-auto">
             <Button variant="ghost" size="md" className="w-full sm:w-auto">
               Change Slot
             </Button>

@@ -37,17 +37,17 @@ const DoctorDetailPage = () => {
     doctorService.getDoctorById(id)
       .then((data) => {
         setDoctor(data);
-        if (data.availableDates && data.availableDates.length > 0) {
+        if (Array.isArray(data?.availableDates) && data.availableDates.length > 0) {
           setSelectedDate(data.availableDates[0]);
         }
-        if (data.timeSlots && data.timeSlots.length > 0) {
+        if (Array.isArray(data?.timeSlots) && data.timeSlots.length > 0) {
           setSelectedTime(data.timeSlots[0]);
         }
         setLoading(false);
       })
       .catch((err) => {
         console.error('Error fetching doctor details:', err);
-        setError(err.message || 'Unable to load doctor profile.');
+        setError(err.response?.data?.message || err.message || 'Unable to load doctor profile.');
         setLoading(false);
       });
   }, [id]);
@@ -58,7 +58,8 @@ const DoctorDetailPage = () => {
       return;
     }
 
-    navigate(`/appointments/book/${doctor.id}?date=${encodeURIComponent(selectedDate)}&time=${encodeURIComponent(selectedTime)}`);
+    const doctorId = doctor?.id || doctor?._id || id;
+    navigate(`/appointments/book/${doctorId}?date=${encodeURIComponent(selectedDate)}&time=${encodeURIComponent(selectedTime)}`);
   };
 
   if (loading) {
@@ -207,7 +208,7 @@ const DoctorDetailPage = () => {
                 1. Select Consultation Date
               </label>
               <div className="grid grid-cols-3 gap-2">
-                {doctor.availableDates?.map((dateStr) => {
+                {Array.isArray(doctor.availableDates) && doctor.availableDates.map((dateStr) => {
                   const isSelected = selectedDate === dateStr;
                   const d = new Date(dateStr);
                   const dayName = isNaN(d.getTime()) ? '' : new Intl.DateTimeFormat('en-US', { weekday: 'short' }).format(d);
@@ -238,7 +239,7 @@ const DoctorDetailPage = () => {
                 2. Available Time Slots
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {doctor.timeSlots?.map((slot) => {
+                {Array.isArray(doctor.timeSlots) && doctor.timeSlots.map((slot) => {
                   const isSelected = selectedTime === slot;
                   return (
                     <button

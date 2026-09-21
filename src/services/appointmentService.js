@@ -12,6 +12,25 @@ const getStoredAppointments = () => {
   return JSON.parse(stored);
 };
 
+export const normalizeAppointment = (apt) => {
+  if (!apt) return null;
+  const id = apt._id ? apt._id.toString() : (apt.id || '');
+  const doctor = typeof apt.doctor === 'object' && apt.doctor !== null ? apt.doctor : {};
+
+  return {
+    ...apt,
+    id,
+    _id: apt._id || id,
+    doctorId: doctor._id ? doctor._id.toString() : (doctor.id || apt.doctorId || ''),
+    doctorName: doctor.name || apt.doctorName || 'Doctor',
+    doctorAvatar: doctor.profileImage || doctor.avatar || apt.doctorAvatar || 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=256',
+    specialization: doctor.specialization || apt.specialization || 'General Specialist',
+    hospital: doctor.clinic?.name || apt.hospital || 'MediConsult Partner Clinic',
+    clinicAddress: apt.clinicAddress || (doctor.clinic ? [doctor.clinic.address, doctor.clinic.city].filter(Boolean).join(', ') : 'Metropolis Health Center'),
+    fee: apt.fee || '$60',
+  };
+};
+
 export const appointmentService = {
   getAppointments: async (statusFilter) => {
     if (isMockMode) {
@@ -20,11 +39,31 @@ export const appointmentService = {
       if (statusFilter && statusFilter !== 'all') {
         list = list.filter((a) => a.status === statusFilter);
       }
-      return list;
+      return list.map(normalizeAppointment);
     }
 
-    const response = await api.get('/appointments', { params: { status: statusFilter } });
-    return response.data;
+    const params = {};
+    if (statusFilter && statusFilter !== 'all') {
+      params.status = statusFilter;
+    }
+
+    const response = await api.get('/appointments', { params });
+    console.log("[APPOINTMENTS API RESPONSE]", response.data);
+
+    let rawList = [];
+    if (response.data) {
+      if (Array.isArray(response.data.data?.appointments)) {
+        rawList = response.data.data.appointments;
+      } else if (Array.isArray(response.data.data)) {
+        rawList = response.data.data;
+      } else if (Array.isArray(response.data.appointments)) {
+        rawList = response.data.appointments;
+      } else if (Array.isArray(response.data)) {
+        rawList = response.data;
+      }
+    }
+
+    return rawList.map(normalizeAppointment);
   },
 
   getAppointmentById: async (id) => {
@@ -33,11 +72,15 @@ export const appointmentService = {
       const list = getStoredAppointments();
       const appointment = list.find((a) => a.id === id);
       if (!appointment) throw new Error('Appointment not found');
-      return appointment;
+      return normalizeAppointment(appointment);
     }
 
     const response = await api.get(`/appointments/${id}`);
-    return response.data;
+    console.log("[APPOINTMENT BY ID API RESPONSE]", response.data);
+
+    const rawApt = response.data?.data || response.data?.appointment || response.data;
+    if (!rawApt) throw new Error('Appointment not found');
+    return normalizeAppointment(rawApt);
   },
 
   bookAppointment: async (bookingData) => {
@@ -65,11 +108,14 @@ export const appointmentService = {
       const current = getStoredAppointments();
       const updated = [newApt, ...current];
       localStorage.setItem('mediconsult_appointments', JSON.stringify(updated));
-      return newApt;
+      return normalizeAppointment(newApt);
     }
 
     const response = await api.post('/appointments', bookingData);
-    return response.data;
+    console.log("[BOOK APPOINTMENT API RESPONSE]", response.data);
+
+    const created = response.data?.data || response.data?.appointment || response.data;
+    return normalizeAppointment(created);
   },
 
   cancelAppointment: async (id, cancellationReason = 'Cancelled by patient') => {
@@ -85,11 +131,12 @@ export const appointmentService = {
         cancellationReason
       };
       localStorage.setItem('mediconsult_appointments', JSON.stringify(current));
-      return current[index];
+      return normalizeAppointment(current[index]);
     }
 
     const response = await api.patch(`/appointments/${id}/cancel`, { cancellationReason });
-    return response.data;
+    const updated = response.data?.data || response.data?.appointment || response.data;
+    return normalizeAppointment(updated);
   },
 
   rescheduleAppointment: async (id, { date, time }) => {
@@ -106,11 +153,12 @@ export const appointmentService = {
         status: 'upcoming'
       };
       localStorage.setItem('mediconsult_appointments', JSON.stringify(current));
-      return current[index];
+      return normalizeAppointment(current[index]);
     }
 
     const response = await api.patch(`/appointments/${id}/reschedule`, { date, time });
-    return response.data;
+    const updated = response.data?.data || response.data?.appointment || response.data;
+    return normalizeAppointment(updated);
   }
 };
 

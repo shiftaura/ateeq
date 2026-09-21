@@ -39,10 +39,11 @@ const MyAppointmentsPage = () => {
     setError(null);
     try {
       const data = await appointmentService.getAppointments();
-      setAppointments(data);
+      setAppointments(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching appointments:', err);
-      setError(err.message || 'Unable to load appointments.');
+      setError(err.response?.data?.message || err.message || 'Unable to load appointments.');
+      setAppointments([]);
     } finally {
       setLoading(false);
     }
@@ -101,7 +102,7 @@ const MyAppointmentsPage = () => {
     }
   };
 
-  const filteredAppointments = appointments.filter((apt) => {
+  const filteredAppointments = (Array.isArray(appointments) ? appointments : []).filter((apt) => {
     if (activeTab === 'upcoming') return apt.status === 'upcoming';
     if (activeTab === 'completed') return apt.status === 'completed';
     if (activeTab === 'cancelled') return apt.status === 'cancelled';

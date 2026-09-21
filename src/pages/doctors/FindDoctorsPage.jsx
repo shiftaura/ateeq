@@ -31,10 +31,11 @@ const FindDoctorsPage = () => {
         specialization: selectedSpecialty,
         availability: selectedAvailability,
       });
-      setDoctors(data);
+      setDoctors(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error('Error fetching doctors:', err);
-      setError(err.message || 'Unable to fetch doctors directory.');
+      setError(err.response?.data?.message || err.message || 'Unable to fetch doctors directory.');
+      setDoctors([]);
     } finally {
       setLoading(false);
     }
@@ -124,7 +125,7 @@ const FindDoctorsPage = () => {
           <LoadingState message="Searching verified doctors..." description="Matching clinical specialties and schedule availability." />
         ) : error ? (
           <ErrorState message={error} onRetry={fetchDoctors} />
-        ) : doctors.length === 0 ? (
+        ) : !Array.isArray(doctors) || doctors.length === 0 ? (
           <EmptyState
             icon={Stethoscope}
             title="No doctors found"
@@ -140,7 +141,7 @@ const FindDoctorsPage = () => {
 
             <div className="space-y-4">
               {doctors.map((doctor) => (
-                <DoctorCard key={doctor.id} doctor={doctor} />
+                <DoctorCard key={doctor.id || doctor._id} doctor={doctor} />
               ))}
             </div>
           </div>
