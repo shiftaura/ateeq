@@ -1,0 +1,78 @@
+// Mock Appointments Data for Demo Mode
+export const mockAppointments = [
+  {
+    id: 'apt_101',
+    doctorId: 'doc_1',
+    doctorName: 'Dr. Michael Chen',
+    doctorAvatar: 'https://images.unsplash.com/photo-1622253692010-333f2da6031d?auto=format&fit=crop&q=80&w=256',
+    specialization: 'General Physician',
+    date: '2026-09-24',
+    time: '10:30 AM',
+    status: 'upcoming', // 'upcoming' | 'completed' | 'cancelled'
+    patientName: 'Sarah Jenkins',
+    patientEmail: 'sarah.jenkins@example.com',
+    patientPhone: '+1 (555) 234-5678',
+    reason: 'Persistent mild fever and dry throat for 2 days; seeking physical consultation.',
+    hospital: 'Metro Health Medical Center',
+    clinicAddress: 'Suite 400, 102 Health Avenue, Downtown',
+    fee: '$60',
+    createdAt: '2026-09-21T09:00:00Z'
+  },
+  {
+    id: 'apt_102',
+    doctorId: 'doc_2',
+    doctorName: 'Dr. Elena Rostova',
+    doctorAvatar: 'https://images.unsplash.com/photo-1594824813589-3221975e7a9b?auto=format&fit=crop&q=80&w=256',
+    specialization: 'Pulmonologist',
+    date: '2026-09-28',
+    time: '02:30 PM',
+    status: 'upcoming',
+    patientName: 'Sarah Jenkins',
+    patientEmail: 'sarah.jenkins@example.com',
+    patientPhone: '+1 (555) 234-5678',
+    reason: 'Follow-up regarding seasonal chest sensitivity and allergy testing.',
+    hospital: 'Apex Chest & Lung Institute',
+    clinicAddress: 'Tower B, 45 Central Medical Park',
+    fee: '$85',
+    createdAt: '2026-09-20T11:20:00Z'
+  },
+  {
+    id: 'apt_103',
+    doctorId: 'doc_4',
+    doctorName: 'Dr. Aisha Patel',
+    doctorAvatar: 'https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=256',
+    specialization: 'Family Medicine',
+    date: '2026-08-15',
+    time: '11:00 AM',
+    status: 'completed',
+    patientName: 'Sarah Jenkins',
+    patientEmail: 'sarah.jenkins@example.com',
+    patientPhone: '+1 (555) 234-5678',
+    reason: 'Routine annual physical and blood pressure checkup.',
+    hospital: 'Riverfront Community Clinic',
+    clinicAddress: '15 Green Street, Riverfront',
+    fee: '$50',
+    createdAt: '2026-08-10T14:30:00Z',
+    // Conditional field: only if API provides it
+    consultationNotes: 'Patient is in healthy baseline condition. Normal blood pressure (118/76 mmHg). Recommended continuing balanced lifestyle and regular physical activity.'
+  },
+  {
+    id: 'apt_104',
+    doctorId: 'doc_5',
+    doctorName: 'Dr. David Kim',
+    doctorAvatar: 'https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?auto=format&fit=crop&q=80&w=256',
+    specialization: 'ENT Specialist',
+    date: '2026-07-22',
+    time: '09:30 AM',
+    status: 'cancelled',
+    patientName: 'Sarah Jenkins',
+    patientEmail: 'sarah.jenkins@example.com',
+    patientPhone: '+1 (555) 234-5678',
+    reason: 'Ear congestion checkup',
+    hospital: 'Grace Ear Nose & Throat Care',
+    clinicAddress: '722 Medical Plaza, 5th Floor',
+    fee: '$70',
+    createdAt: '2026-07-20T16:00:00Z',
+    cancellationReason: 'Cancelled by patient due to schedule conflict.'
+  }
+];
